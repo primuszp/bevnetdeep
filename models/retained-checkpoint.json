@@ -1,8 +1,0 @@
-{
-  "id": "bev_v19_final",
-  "filename": "bev_v19_final.pt",
-  "seed": 123,
-  "description": "Retained 12-channel model used for detailed analyses",
-  "epoch_one_based": 111,
-  "sha256": "79ef81a4bf42117e00350d514b465f3be028fc222fb8d511e8d38d6b2fb548c8"
-}

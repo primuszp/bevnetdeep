@@ -57,7 +57,7 @@ def parse_args(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument(
         "--weights", required=True,
-        help="trained BEV weights file or retained alias (v19/v20)",
+        help="trained BEV weights file or checkpoint ID (e.g. paper-model)",
     )
     p.add_argument("--dataset-dir", default=str(dataset_root()))
     p.add_argument("--out-dir", default=str(output_root() / "eval"))

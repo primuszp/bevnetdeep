@@ -44,7 +44,7 @@ def parse_args(argv=None):
     p.add_argument("--off-ground", default="jeli_cars_off_ground.las")
     p.add_argument(
         "--weights", required=True,
-        help="trained BEV weights file or retained alias (v19/v20)",
+        help="trained BEV weights file or checkpoint ID (e.g. paper-model)",
     )
     p.add_argument("--out", default=str(output_root() / "jeli"))
     p.add_argument("--output-prefix", default="jeli_bev", help="basename used for PNG/CSV outputs")

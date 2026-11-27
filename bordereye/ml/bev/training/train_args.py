@@ -115,7 +115,7 @@ def build_parser(description: str | None = None) -> argparse.ArgumentParser:
     p.add_argument("--no-pin-memory", action="store_true")
     p.add_argument(
         "--resume", nargs="?", const="__best__", default=None,
-        help="checkpoint path or retained alias (v19, v19-bootstrap, v20, v20-bootstrap)",
+        help="checkpoint path or checkpoint ID (e.g. training-warm-start)",
     )
     p.add_argument("--resume-training-state", action="store_true",
                    help="also restore optimizer/scheduler/epoch/best counters from a training checkpoint")

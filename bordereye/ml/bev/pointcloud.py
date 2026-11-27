@@ -95,7 +95,7 @@ def build_parser() -> argparse.ArgumentParser:
     bev = parser.add_argument_group("BEV inference")
     bev.add_argument(
         "--weights", required=True,
-        help="trained BEV weights file or retained alias (v19/v20)",
+        help="trained BEV weights file or checkpoint ID (e.g. paper-model)",
     )
     bev.add_argument("--cell", default="auto", help="'auto' uses the weights file's cell")
     bev.add_argument(

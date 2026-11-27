@@ -83,12 +83,11 @@ def models_root() -> Path:
 
 
 _CHECKPOINT_ALIASES = {
-    "v19": "bev_v19_final",
-    "v19-final": "bev_v19_final",
-    "v19-bootstrap": "bev_v19_bootstrap_v18",
-    "v20": "bev_vehicle_12ch_v20_best",
-    "v20-final": "bev_vehicle_12ch_v20_best",
-    "v20-bootstrap": "bev_v20_bootstrap",
+    "paper-model": "bevnetdeep-vehicle-detection",
+    "training-warm-start": "bevnetdeep-training-warm-start",
+    "v19": "bevnetdeep-vehicle-detection",
+    "v19-final": "bevnetdeep-vehicle-detection",
+    "v19-bootstrap": "bevnetdeep-training-warm-start",
 }
 
 

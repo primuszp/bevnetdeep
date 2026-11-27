@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "artifacts": [
+    {
+      "id": "bevnetdeep-vehicle-detection",
+      "local_path": "models/bevnetdeep-vehicle-detection.pt",
+      "purpose": "Reported seed-123 vehicle detector",
+      "sha256": "b06a162f2eaf9ffdc715ad0c92a8bb8f6394500e07e58a36d4b3e71c8b6283f5",
+      "size_bytes": 35140732,
+      "original_sha256": "79ef81a4bf42117e00350d514b465f3be028fc222fb8d511e8d38d6b2fb548c8",
+      "input_channels": 12,
+      "seed": 123,
+      "epoch_one_based": 111
+    },
+    {
+      "id": "bevnetdeep-training-warm-start",
+      "local_path": "models/bevnetdeep-training-warm-start.pt",
+      "purpose": "Initial weights for the reported training recipe",
+      "sha256": "78a31f3d9e10ccddea63cc1a397f8496200006f63f673d3c885f03bbe30ddf3b",
+      "size_bytes": 35140498,
+      "original_sha256": "0241aa88b505a67f77946d39abee7995e86b0327a55df9f3aedfadbf8d08de14",
+      "input_channels": 12
+    }
+  ]
+}

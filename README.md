@@ -17,12 +17,27 @@ python scripts/summarize_counts.py --baselines
 ```
 
 The example builds the ordered 12 BEV channels from a synthetic parking scene
-and runs CPU inference, score calculation and rotated NMS. It uses randomly
-initialised weights by default and checks the pipeline rather than detection
-accuracy. With the retained checkpoint available, pass `--weights
-/path/to/bev_v19_final.pt` to run the same scene with the trained model.
-The checkpoint identifier and SHA-256 are in
-[`models/retained-checkpoint.json`](models/retained-checkpoint.json).
+and runs CPU inference, score calculation and rotated NMS. The default run
+uses randomly initialised weights as a pipeline check.
+
+## Trained weights
+
+Clone the repository with [Git LFS](https://git-lfs.com/) installed and run
+the following from the checkout:
+
+```text
+git lfs pull
+python examples/synthetic_inference.py --weights models/bevnetdeep-vehicle-detection.pt
+```
+
+| File | Purpose |
+|---|---|
+| `models/bevnetdeep-vehicle-detection.pt` | Seed-123 vehicle detector used for the paper's detailed results. |
+| `models/bevnetdeep-training-warm-start.pt` | Initial trained weights for the recorded training recipe. |
+
+Each file contains the original model tensors and the architecture and
+normalisation metadata needed to load them. See
+[`models/checkpoints.json`](models/checkpoints.json) for SHA-256 checksums.
 
 ## Data and evaluation
 
@@ -45,7 +60,7 @@ follows. For WiSAR3D, use `--source wisar --pattern "wisar_m*.npz"` and a
 distinct output directory.
 
 ```text
-bordereye-bev-evaluate --weights path/to/bev_v19_final.pt --dataset-dir path/to/bev --out-dir output/dales --source dales --split test --pattern "dales_*.npz" --box-target valid --conf 0.25 --nms-iou 0.20 --match-iou 0.30 --ap-iou-list 0.30,0.50 --decode-score-mode hm_seg_center_obb --no-amp
+bordereye-bev-evaluate --weights models/bevnetdeep-vehicle-detection.pt --dataset-dir path/to/bev --out-dir output/dales --source dales --split test --pattern "dales_*.npz" --box-target valid --conf 0.25 --nms-iou 0.20 --match-iou 0.30 --ap-iou-list 0.30,0.50 --decode-score-mode hm_seg_center_obb --no-amp
 ```
 
 The included CSVs support offline verification of the retained seed-123 TP,
@@ -64,12 +79,13 @@ and checkpoints for the other two historical runs are unavailable in the
 archived materials used for this release.
 
 ```text
-bordereye-bev-train --config configs/seed-123.json --dataset-dir path/to/bev --split-manifest splits/seed-123-train-val.json --resume path/to/warm-start.pt --output-dir output/seed-123
+bordereye-bev-train --config configs/seed-123.json --dataset-dir path/to/bev --split-manifest splits/seed-123-train-val.json --resume models/bevnetdeep-training-warm-start.pt --output-dir output/seed-123
 ```
 
-This command requires the original prepared training inputs and warm-start
-weights to replay the recorded run. Use `--device cpu --no-amp` for local
-diagnostics and the synthetic example for a quick installation check.
+This command requires the original prepared training inputs. It initialises
+model weights from the warm-start file and starts a fresh optimiser, as in the
+recorded run. Use `--device cpu --no-amp` for local diagnostics and the
+synthetic example for a quick installation check.
 
 The source code is licensed under [Apache-2.0](LICENSE). Data and weights
 have their own redistribution terms. The citation metadata is in

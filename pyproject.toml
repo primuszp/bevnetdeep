@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bevnetdeep"
-version = "1.0.0"
+version = "1.0.1"
 description = "Vehicle detection from airborne LiDAR using a 12-channel bird's-eye view representation."
 readme = "README.md"
 requires-python = ">=3.10"

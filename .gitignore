@@ -13,5 +13,7 @@ dist/
 *.npz
 *.pt
 *.pth
+!/models/bevnetdeep-vehicle-detection.pt
+!/models/bevnetdeep-training-warm-start.pt
 .env
 .env.*
