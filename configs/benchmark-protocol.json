@@ -1,0 +1,32 @@
+{
+  "training_seeds": [
+    42,
+    123,
+    2026
+  ],
+  "split_seed": 42,
+  "cell_size_m": 0.2,
+  "score_mode": "hm_seg_center_obb",
+  "score_threshold": 0.25,
+  "rotated_nms_iou": 0.2,
+  "rotated_match_iou": 0.3,
+  "ap_iou_thresholds": [
+    0.3,
+    0.5
+  ],
+  "box_target": "valid",
+  "channel_order": [
+    "ground_occ",
+    "ground_shadow",
+    "ground_edt",
+    "shadow_edt",
+    "veh_width_hole",
+    "veh_h_p05",
+    "veh_h_p95",
+    "veh_h_span",
+    "veh_sobel",
+    "veh_h_p95_hillshade_multi",
+    "dtm_slope",
+    "all_density"
+  ]
+}

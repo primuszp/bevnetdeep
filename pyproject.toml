@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bevnetdeep"
+version = "1.0.0"
+description = "Vehicle detection from airborne LiDAR using a 12-channel bird's-eye view representation."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+dependencies = [
+  "numpy>=1.24",
+  "scipy>=1.10",
+  "torch>=2.3",
+  "matplotlib>=3.8",
+  "laspy>=2.4",
+  "lazrs>=0.6",
+  "pyproj>=3.6",
+  "pyshp>=2.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+bordereye-bev = "bordereye.ml.bev.workflow:main"
+bordereye-bev-train = "bordereye.ml.bev.workflow:train"
+bordereye-bev-evaluate = "bordereye.ml.bev.workflow:evaluate"
+bordereye-bev-detect = "bordereye.ml.bev.workflow:detect"
+
+[tool.setuptools.packages.find]
+include = ["bordereye*"]
+
+[tool.setuptools.package-data]
+bordereye = ["py.typed"]
+"bordereye.ml.bev" = ["configs/*.json"]

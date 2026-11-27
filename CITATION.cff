@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: Please cite the BevNetDeep software and the accompanying Remote Sensing article.
+title: "BevNetDeep: Vehicle Detection in Airborne LiDAR Point Clouds"
+type: software
+version: 1.0.0
+license: Apache-2.0
+repository-code: "https://github.com/primuszp/bevnetdeep"
+authors:
+  - family-names: Primusz
+    given-names: Péter
+  - family-names: Kisfaludi
+    given-names: Balázs
+  - family-names: Czimber
+    given-names: Kornél

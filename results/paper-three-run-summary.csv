@@ -1,0 +1,7 @@
+metric,dales_mean,dales_sample_sd,wisar3d_mean,wisar3d_sample_sd
+Precision,0.952,0.005,0.972,0.002
+Recall,0.961,0.005,0.976,0.002
+F1,0.957,0.001,0.974,0.001
+AP@0.30,0.972,0.001,0.970,0.002
+AP@0.50,0.950,0.001,0.920,0.003
+Mean matched IoU,0.830,0.004,0.812,0.002
