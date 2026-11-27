@@ -69,7 +69,7 @@ from bordereye.ml.bev.core.orientation import (
 )
 from bordereye.ml.bev.data.paths import project_root
 from bordereye.ml.bev.data.selection import parse_csv_set
-from bordereye.ml.bev.training.checkpointing import checkpoint_score, segmentation_contract
+from bordereye.ml.bev.training.checkpointing import checkpoint_score, save_checkpoint, segmentation_contract
 from bordereye.ml.bev.training.engine import (
     LossOut,
     nonfinite_grad_summary,
@@ -518,7 +518,7 @@ def main(argv=None):
         diag("WARNING", "[shadow] --shadow-weight > 0 but no 'ground_shadow' channel; disabling.")
     built = build_and_resume_model(args, n_ch, ch_names, cue_idx, dev, out_dir)
     if built is None:
-        return
+        raise ValueError("Training aborted because the requested checkpoint is incompatible.")
     model, loaded_ck = built
     if int(getattr(model, "output_stride", output_stride)) != output_stride:
         raise RuntimeError("model and target output strides disagree")
@@ -1749,12 +1749,7 @@ def main(argv=None):
             ckpt_payload["best_val"] = best
             ckpt_payload["bad_epochs"] = bad
             ckpt_out.parent.mkdir(parents=True, exist_ok=True)
-            if getattr(args, "epoch_resume_snapshot", False):
-                best_tmp = ckpt_out.with_suffix(ckpt_out.suffix + ".tmp")
-                torch.save(ckpt_payload, best_tmp)
-                best_tmp.replace(ckpt_out)
-            else:
-                torch.save(ckpt_payload, ckpt_out)
+            save_checkpoint(ckpt_payload, ckpt_out)
             star = "  *saved"
         elif ema_val is not None:
             bad += 1
@@ -1765,10 +1760,10 @@ def main(argv=None):
                 best_seg = seg_select
                 ckpt_payload["best_seg"] = best_seg
                 seg_out = ckpt_out.with_name(ckpt_out.stem + "_best_seg" + ckpt_out.suffix)
-                torch.save(ckpt_payload, seg_out)
+                save_checkpoint(ckpt_payload, seg_out)
         ckpt_last.parent.mkdir(parents=True, exist_ok=True)
         if not getattr(args, "epoch_resume_snapshot", False):
-            torch.save(ckpt_payload, ckpt_last)
+            save_checkpoint(ckpt_payload, ckpt_last)
         if args.save_epoch_weights:
             # Numbered per-epoch weights for post-hoc epoch selection/eval.
             # Optimizer/scheduler state is left out (resume uses *_last.pt),
@@ -1779,7 +1774,7 @@ def main(argv=None):
                 k: v for k, v in ckpt_payload.items() if k not in ("optimizer", "scheduler")
             }
             ep_stem = Path(ckpt_name).stem
-            torch.save(ep_payload, ep_dir / f"{ep_stem}_ep{ep + 1:03d}.pt")
+            save_checkpoint(ep_payload, ep_dir / f"{ep_stem}_ep{ep + 1:03d}.pt")
             keep = int(args.epoch_weights_keep)
             if keep > 0:
                 snaps = sorted(ep_dir.glob(f"{ep_stem}_ep*.pt"))
@@ -1953,9 +1948,7 @@ def main(argv=None):
                     ckpt_out, map_location="cpu", weights_only=False)
             # Commit after logging/visualization. A partial write leaves the
             # preceding epoch's restart checkpoint intact.
-            restart_tmp = ckpt_last.with_suffix(ckpt_last.suffix + ".tmp")
-            torch.save(ckpt_payload, restart_tmp)
-            restart_tmp.replace(ckpt_last)
+            save_checkpoint(ckpt_payload, ckpt_last)
         done_eps = ep - start_epoch + 1
         total_el = time.time() - t_train_start
         avg_ep = total_el / max(done_eps, 1)

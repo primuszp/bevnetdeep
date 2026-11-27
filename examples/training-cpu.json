@@ -1,0 +1,16 @@
+{
+  "sources": "synth",
+  "arch": "deep",
+  "arch_base": 8,
+  "epochs": 1,
+  "min_epochs": 1,
+  "warmup_epochs": 0,
+  "batch": 2,
+  "crop": 64,
+  "crops_per_epoch": 4,
+  "val_crops": 2,
+  "workers": 0,
+  "device": "cpu",
+  "amp": false,
+  "out_name": "tutorial.pt"
+}

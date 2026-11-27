@@ -44,6 +44,8 @@ def build_and_resume_model(args, n_ch, ch_names, cue_idx, dev, out_dir):
         else resolve_checkpoint_path(args.resume)
     )
     if not ckpt_path.exists():
+        if args.resume != "__best__":
+            raise FileNotFoundError(f"Requested --resume checkpoint does not exist: {ckpt_path}")
         print(f"--resume: {ckpt_path} not found, starting fresh.")
         return model, loaded_ck
 

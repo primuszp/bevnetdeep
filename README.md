@@ -5,6 +5,10 @@ Point Clouds Using a Multi-Channel Bird’s-Eye View Representation* by Péter
 Primusz, Balázs Kisfaludi and Kornél Czimber, accepted in *Remote Sensing*.
 The implementation retains the `bordereye.ml.bev` Python namespace.
 
+For a worked CPU training example, inference on a LAS/LAZ survey, and a guide
+to the output files, see [Training and inference](examples/README.md).
+The guide is also available in [Hungarian (magyar)](examples/README.hu.md).
+
 ## Install and run a synthetic example
 
 From the repository root in a Python 3.10 or newer environment:
@@ -19,6 +23,17 @@ python scripts/summarize_counts.py --baselines
 The example builds the ordered 12 BEV channels from a synthetic parking scene
 and runs CPU inference, score calculation and rotated NMS. The default run
 uses randomly initialised weights as a pipeline check.
+
+To train a small model from scratch on generated data and use the saved weights:
+
+```text
+python -m bordereye.ml.bev.data.build_dataset --sources synth --out output/tutorial/data --n-train 4 --n-test 1 --tile-size 32 --veh-per-scene 2 4 --workers 1 --no-viz
+bordereye-bev-train --config examples/training-cpu.json --dataset-dir output/tutorial/data --output-dir output/tutorial/training
+python examples/synthetic_inference.py --weights output/tutorial/training/tutorial.pt
+```
+
+This one-epoch example exercises the training pipeline. For survey inference,
+use the trained vehicle detector below.
 
 ## Trained weights
 
@@ -38,11 +53,28 @@ python examples/synthetic_inference.py --weights models/bevnetdeep-vehicle-detec
 Each file contains the original model tensors and the architecture and
 normalisation metadata needed to load them. See
 [`models/checkpoints.json`](models/checkpoints.json) for SHA-256 checksums.
+Load checkpoints only from trusted sources. The loader supports historical
+PyTorch checkpoints that use Python pickle.
+
+Replace `survey.laz` with the path to your metric LAS/LAZ point cloud:
+
+```text
+bordereye-bev-detect --input "survey.laz" --weights models/bevnetdeep-vehicle-detection.pt --output-dir output/survey --confidence 0.25 --decode-score-mode hm_seg_center_obb --nms-iou 0.20 --device cpu --no-amp
+```
+
+For this input, open `output/survey/survey_detections.png` for a visual check,
+`survey_boxes.csv` for box coordinates and scores, or `survey_vehicles.geojson`
+in a GIS. All three files are written to the same output directory.
 
 ## Data and evaluation
 
-Obtain [DALES Objects](https://sites.google.com/a/udayton.edu/vasari1/research/earth-vision/dales)
-and [WiSAR3D](https://wisar3d.github.io/) from their providers. The paper's
+* **DALES Objects** includes the instance labels used for vehicle references.
+  Request access through the University of Dayton's [download form](https://forms.gle/NFuLM6MrgEz8MmoV7).
+  The [dataset page](https://sites.google.com/a/udayton.edu/vasari1/research/earth-vision/dales) describes both versions.
+* **WiSAR3D** is distributed as a labels archive and four point-cloud parts.
+  Download all five from the [Technion download page](https://cgmdata.ece.technion.ac.il/public/data/WiSAR3D/).
+
+The paper's
 evaluator expects preprocessed BEV `.npz` tiles under `train/` and `test/`,
 including the paper-specific valid and ignored vehicle boxes. The original
 datasets alone do not recover the edited reference boxes, generated ignore

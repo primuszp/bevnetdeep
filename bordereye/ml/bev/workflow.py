@@ -33,7 +33,8 @@ def jeli(args: Sequence[str] | None = None) -> None:
     except ModuleNotFoundError as exc:
         if exc.name in {"laspy", "matplotlib", "torch"}:
             raise ModuleNotFoundError(
-                "Jeli inference requires: pip install 'bordereye[bev,io]'"
+                f"Missing dependency {exc.name!r}. Install BevNetDeep with "
+                "'python -m pip install .' from the repository root."
             ) from exc
         raise
 
@@ -68,6 +69,9 @@ def run(command: str, args: Sequence[str] = ()) -> None:
 
 def main(args: Sequence[str] | None = None) -> None:
     argv = _extra_args(args)
+    if argv in (["-h"], ["--help"]):
+        print(f"usage: bordereye-bev [{' | '.join(COMMANDS)}] [options]")
+        return
     if not argv or argv[0] not in COMMANDS:
         names = " | ".join(COMMANDS)
         raise SystemExit(f"usage: python -m bordereye.ml.bev.workflow [{names}] [options]")

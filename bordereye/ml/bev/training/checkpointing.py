@@ -2,6 +2,21 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+
+import torch
+
+
+def save_checkpoint(payload: dict, destination: Path) -> None:
+    """Replace a checkpoint only after its complete payload has been written."""
+    with NamedTemporaryFile(dir=destination.parent, suffix=".tmp", delete=False) as stream:
+        temporary = Path(stream.name)
+    try:
+        torch.save(payload, temporary)
+        temporary.replace(destination)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def segmentation_contract(args) -> dict:

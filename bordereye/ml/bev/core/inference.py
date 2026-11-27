@@ -111,19 +111,21 @@ def load_bevnet_checkpoint(
 
 # ── Sliding-window inference utilities ────────────────────────────────────────
 
-def window_starts(size: int, win: int, step: int) -> list[int]:
-    """Sliding-window start offsets that always cover the far edge."""
+def window_starts(size: int, win: int, step: int, *, stride: int = 1) -> list[int]:
+    """Cover the far edge while keeping each window on the model's output grid."""
     if win <= 0:
         raise ValueError(f"window size must be positive, got {win}")
-    if step <= 0:
-        raise ValueError(f"window step must be positive; got step={step} (win={win})")
+    if not 0 < step <= win:
+        raise ValueError(f"window step must be between 1 and {win}; got {step}")
+    if not 0 < stride <= win:
+        raise ValueError(f"output stride must be between 1 and {win}; got {stride}")
+    if size <= 0:
+        raise ValueError(f"raster dimension must be positive, got {size}")
     if size <= win:
         return [0]
-    starts = list(range(0, size - win + 1, step))
-    last = size - win
-    if starts[-1] != last:
-        starts.append(last)
-    return starts
+    aligned_step = max(stride, step // stride * stride)
+    last = ((size - win + stride - 1) // stride) * stride
+    return [*range(0, last, aligned_step), last]
 
 
 def run_sliding_window(
@@ -159,9 +161,9 @@ def run_sliding_window(
     if world_origin.shape != (2,) or not np.isfinite(world_origin).all():
         raise ValueError("origin must contain two finite coordinates")
     step = win - overlap
-    if win <= 0 or step <= 0:
+    if win <= 0 or not 0 <= overlap < win:
         raise ValueError(
-            f"window must be positive and overlap smaller than it; got win={win}, overlap={overlap}"
+            f"expected 0 <= overlap < window; got win={win}, overlap={overlap}"
         )
     batch_size = int(batch_size)
     if batch_size < 0:
@@ -175,7 +177,7 @@ def run_sliding_window(
             elif total_memory >= 8 * 1024 ** 3:
                 batch_size = 2
 
-    stride = int(output_stride or getattr(model, "output_stride", STRIDE))
+    stride = int(getattr(model, "output_stride", STRIDE) if output_stride is None else output_stride)
     if stride <= 0:
         raise ValueError(f"output_stride must be positive, got {stride}")
     n_channels, height, width = channels.shape
@@ -185,11 +187,14 @@ def run_sliding_window(
     full_seg = np.zeros_like(full_hm)
     detections: list[dict] = []
     use_amp = bool(amp) and dev.type == "cuda"
+    row_starts = window_starts(height, win, step, stride=stride)
+    col_starts = window_starts(width, win, step, stride=stride)
     windows = [
         (r0, c0, min(r0 + win, height), min(c0 + win, width))
-        for r0 in window_starts(height, win, step)
-        for c0 in window_starts(width, win, step)
+        for r0 in row_starts
+        for c0 in col_starts
     ]
+    batch_size = min(batch_size, len(windows))
     tile_batch = np.zeros((batch_size, n_channels, win, win), np.float32)
 
     with torch.inference_mode():
